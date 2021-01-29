@@ -97,20 +97,52 @@ def text_to_speech(ocr_text,filename):
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config, audio_config=audio_output)
     audio_result = speech_synthesizer.speak_text_async(ocr_text).get()#create an audio file
     
-def text_to_ytsearch(ocr_text):    
+def text_to_ytsearch(ocr_text):   
     #connect API: Youtube Data API v3
     api_key='AIzaSyAFOER3IwBh6IvTWGAhvW2ay7vFlvNBq58'
     youtube=build('youtube','v3',developerKey=api_key)
-                      
-    #Code: Connect Youtube Search Engine (每日搜尋上限為10,000筆結果)
-    req=youtube.search().list(q=ocr_text,part='snippet',type='video',maxResults=5) 
-    res=req.execute()
+    
+    #preprocessing keywords for YT search
+    #使用正規表示式去除數字/英文/符號
+    r1 = '[a-zA-Z0-9’!"#$%&\'()*+,-./:;<=>?@，。?★、…【】《》？“”‘’！[\\]^_`{|}~]+'
+    paragraph=re.sub(r1, '', ocr_text) 
+    
+    #Split string in a certain length
+    keywords=[]
+    x = 10
+    for i in range(0, len(paragraph), x):
+        keywords.append(paragraph[i: i + x]) 
+
+    #Code: Connect Youtube Search Engine (每日搜尋上限為10,000筆結果)   
     results = list()
-    for item in res['items']:
-        vid_obj = dict()
-        vid_obj['video_thumbnails']=item['snippet']['thumbnails']['medium']['url']  
-        vid_obj['video_url']='https://www.youtube.com/watch?v='+item['id']['videoId']
-        results.append(vid_obj)
+    if len(keywords) == 1:
+        for keyword in keywords:
+            req=youtube.search().list(q=keyword,part='snippet',type='video',maxResults=3) 
+            res=req.execute()
+            for item in res['items']:
+                vid_obj = dict()
+                vid_obj['video_thumbnails']=item['snippet']['thumbnails']['medium']['url']  
+                vid_obj['video_url']='https://www.youtube.com/watch?v='+item['id']['videoId']
+                results.append(vid_obj)
+    
+    elif len(keywords) == 2:
+        for keyword in keywords:
+            req=youtube.search().list(q=keyword,part='snippet',type='video',maxResults=1) 
+            res=req.execute()
+            for item in res['items']:
+                vid_obj = dict()
+                vid_obj['video_thumbnails']=item['snippet']['thumbnails']['medium']['url']  
+                vid_obj['video_url']='https://www.youtube.com/watch?v='+item['id']['videoId']
+                results.append(vid_obj)
+    else:
+        for keyword in sample(keywords, 3): #随机抽取若5个元素（不重複抽樣）
+            req=youtube.search().list(q=keyword,part='snippet',type='video',maxResults=1) 
+            res=req.execute()
+            for item in res['items']:
+                vid_obj = dict()
+                vid_obj['video_thumbnails']=item['snippet']['thumbnails']['medium']['url']  
+                vid_obj['video_url']='https://www.youtube.com/watch?v='+item['id']['videoId']
+                results.append(vid_obj)
     return results
         
         
