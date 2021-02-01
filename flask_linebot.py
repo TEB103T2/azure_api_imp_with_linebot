@@ -12,6 +12,8 @@ from linebot.models import (
 )
 from AzureProject_HelpBlinder_Final import *
 import os
+import wave
+import contextlib
 # create flask server
 app = Flask(__name__)
 # your linebot message API - Channel access token (from LINE Developer)
@@ -19,7 +21,7 @@ line_bot_api = LineBotApi('AoLCtbL0Q7oa5JVHfbSLCYvkMOagroiZPOI2Us4lMJcpN8t1YhHQg
 # your linebot message API - Channel secret
 handler = WebhookHandler('9abe71bd007f6791fc06e3e977eba873')
 # Linebot webhook URL (only survive 2 hours)
-NGROK_URL = 'https://46924cee4d81.ngrok.io'
+NGROK_URL = 'https://eb372f3fe052.ngrok.io'
 
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -68,12 +70,16 @@ def handle_image(event):
     reply_text = image_to_text(img_data = image_data)
     # text to speech
     text_to_speech(reply_text,message_id)
+    with contextlib.closing(wave.open('./static/audio/%s.wav'%(message_id),'r')) as f:
+        frames = f.getnframes()
+        rate = f.getframerate()
+        duration = frames / float(rate)
     # search youtube video
     vids = text_to_ytsearch(reply_text)
     # reply messages
     SendMessages = list()
     SendMessages.append(TextSendMessage(text = reply_text))
-    SendMessages.append(AudioSendMessage(original_content_url='%s/static/audio/%s.wav'%(NGROK_URL,message_id), duration=60000))
+    SendMessages.append(AudioSendMessage(original_content_url='%s/static/audio/%s.wav'%(NGROK_URL,message_id), duration=duration))
     if len(vids)>0 :
         for obj in vids:
             if len(SendMessages)==5:
