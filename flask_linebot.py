@@ -73,7 +73,7 @@ def handle_image(event):
     with contextlib.closing(wave.open('./static/audio/%s.wav'%(message_id),'r')) as f:
         frames = f.getnframes()
         rate = f.getframerate()
-        duration = frames / float(rate)
+        duration = frames / float(rate*1000)
     # search youtube video
     vids = text_to_ytsearch(reply_text)
     # reply messages
