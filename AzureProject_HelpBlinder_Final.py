@@ -16,7 +16,7 @@ def image_to_text(img_data):
     #img URL:'Content-Type': 'application/json'
     headers_cv = {
         'Content-Type': 'application/octet-stream',
-        'Ocp-Apim-Subscription-Key': '79787c2cba6640c688aa28214ca84cdb',
+        'Ocp-Apim-Subscription-Key': 'put your key here',
     }
 
     params_cv = urllib.parse.urlencode({
@@ -36,7 +36,7 @@ def image_to_text(img_data):
     lang=parsed['language'] #英文en/繁中zh-Hant/簡中zh-Hans
     
     #connect API: Translate(translate English to Chinese)
-    subscription_key = "7dc4a96f371d44b5abc3a79fb8dd1275"
+    subscription_key = "put your subscription_key here"
     endpoint = "https://api.cognitive.microsofttranslator.com/"
     location = "global"
     path = '/translate'
@@ -84,7 +84,7 @@ def image_to_text(img_data):
 
 def text_to_speech(ocr_text,filename):    
     #connect API: Text-to-Speech
-    speech_key, service_region = "492b3d4205594a4fb05920a6281c9b4e", "southcentralus"
+    speech_key, service_region = "put your speech_key here", "southcentralus"
     speech_config = speechsdk.SpeechConfig(subscription=speech_key, region=service_region,speech_recognition_language='zh-TW')
     speech_config.speech_synthesis_language = 'zh-TW' #set language of speech
     speech_synthesizer = speechsdk.SpeechSynthesizer(speech_config=speech_config)
@@ -99,7 +99,7 @@ def text_to_speech(ocr_text,filename):
     
 def text_to_ytsearch(ocr_text):   
     #connect API: Youtube Data API v3
-    api_key='AIzaSyAFOER3IwBh6IvTWGAhvW2ay7vFlvNBq58'
+    api_key='put your api_key here'
     youtube=build('youtube','v3',developerKey=api_key)
     
     #preprocessing keywords for YT search
